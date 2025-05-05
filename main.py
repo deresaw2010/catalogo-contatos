@@ -1,5 +1,6 @@
-# Agenda de contatos
-agenda = []
+# main.py
+
+import contatos
 
 def exibir_menu():
     print("\n--- MENU ---")
@@ -10,88 +11,72 @@ def exibir_menu():
     print("5. Excluir contato")
     print("6. Sair")
 
-def adicionar_contato():
-    nome = input("Nome: ")
-    endereco = input("Endereço: ")
-    telefone = input("Telefone: ")
-    email = input("Email: ")
-    
-    contato = {
-        "nome": nome,
-        "endereco": endereco,
-        "telefone": telefone,
-        "email": email
-    }
-    
-    agenda.append(contato)
-    print(f"Contato de {nome} adicionado com sucesso!")
+def main():
+    while True:
+        exibir_menu()
+        opcao = input("Escolha uma opção (1-6): ")
 
-def listar_contatos():
-    if not agenda:
-        print("Agenda vazia.")
-        return
-    
-    print("\n--- CONTATOS ---")
-    for i, contato in enumerate(agenda):
-        print(f"{i + 1}. {contato['nome']} - {contato['telefone']} - {contato['email']}")
+        if opcao == "1":
+            nome = input("Nome: ")
+            endereco = input("Endereço: ")
+            telefone = input("Telefone: ")
+            email = input("Email: ")
+            contatos.adicionar_contato(nome, endereco, telefone, email)
+            print("Contato adicionado com sucesso!")
 
-def buscar_contato():
-    nome = input("Digite o nome para buscar: ")
-    encontrados = [c for c in agenda if c['nome'].lower() == nome.lower()]
-    
-    if encontrados:
-        for c in encontrados:
-            print(f"Nome: {c['nome']}")
-            print(f"Endereço: {c['endereco']}")
-            print(f"Telefone: {c['telefone']}")
-            print(f"Email: {c['email']}")
-            print("--------------")
-    else:
-        print("Contato não encontrado.")
+        elif opcao == "2":
+            lista = contatos.listar_contatos()
+            if not lista:
+                print("Agenda vazia.")
+            else:
+                print("\n--- CONTATOS ---")
+                for i, c in enumerate(lista):
+                    print(f"{i + 1}. {c['nome']} - {c['telefone']} - {c['email']}")
 
-def editar_contato():
-    nome = input("Digite o nome do contato a editar: ")
-    for contato in agenda:
-        if contato['nome'].lower() == nome.lower():
+        elif opcao == "3":
+            nome = input("Digite o nome para buscar: ")
+            resultados = contatos.buscar_contato_por_nome(nome)
+            if resultados:
+                for c in resultados:
+                    print(f"Nome: {c['nome']}")
+                    print(f"Endereço: {c['endereco']}")
+                    print(f"Telefone: {c['telefone']}")
+                    print(f"Email: {c['email']}")
+                    print("--------------")
+            else:
+                print("Contato não encontrado.")
+
+        elif opcao == "4":
+            nome = input("Digite o nome do contato a editar: ")
             print("Deixe em branco para manter o valor atual.")
+            atual = contatos.buscar_contato_por_nome(nome)
+            if not atual:
+                print("Contato não encontrado.")
+                continue
+            contato = atual[0]
             novo_endereco = input(f"Novo endereço [{contato['endereco']}]: ") or contato['endereco']
             novo_telefone = input(f"Novo telefone [{contato['telefone']}]: ") or contato['telefone']
             novo_email = input(f"Novo email [{contato['email']}]: ") or contato['email']
-            
-            contato['endereco'] = novo_endereco
-            contato['telefone'] = novo_telefone
-            contato['email'] = novo_email
-            
-            print("Contato atualizado com sucesso!")
-            return
-    print("Contato não encontrado.")
 
-def excluir_contato():
-    nome = input("Digite o nome do contato a excluir: ")
-    for i, contato in enumerate(agenda):
-        if contato['nome'].lower() == nome.lower():
-            del agenda[i]
-            print("Contato excluído com sucesso!")
-            return
-    print("Contato não encontrado.")
+            sucesso = contatos.editar_contato(nome, novo_endereco, novo_telefone, novo_email)
+            if sucesso:
+                print("Contato atualizado com sucesso.")
+            else:
+                print("Erro ao atualizar o contato.")
 
-# Loop principal
-while True:
-    exibir_menu()
-    opcao = input("Escolha uma opção (1-6): ")
+        elif opcao == "5":
+            nome = input("Digite o nome do contato a excluir: ")
+            if contatos.excluir_contato(nome):
+                print("Contato excluído com sucesso!")
+            else:
+                print("Contato não encontrado.")
 
-    if opcao == "1":
-        adicionar_contato()
-    elif opcao == "2":
-        listar_contatos()
-    elif opcao == "3":
-        buscar_contato()
-    elif opcao == "4":
-        editar_contato()
-    elif opcao == "5":
-        excluir_contato()
-    elif opcao == "6":
-        print("Saindo da agenda. Até logo!")
-        break
-    else:
-        print("Opção inválida. Tente novamente.")
+        elif opcao == "6":
+            print("Saindo da agenda. Até logo!")
+            break
+
+        else:
+            print("Opção inválida. Tente novamente.")
+
+if __name__ == "__main__":
+    main()
